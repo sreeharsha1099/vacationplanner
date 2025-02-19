@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacation Day Planner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        td:nth-child(1) {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .add-buttons, .delete-buttons, .save-buttons {
+            text-align: center;
+            margin: 20px;
+        }
+        @media (max-width: 600px) {
+            table, th, td {
+                display: block;
+                width: 100%;
+            }
+            th, td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+            th::before, td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            loadTableData();
+        });
+
+        function addRow() {
+            const table = document.querySelector('tbody');
+            const newRow = document.createElement('tr');
+
+            const dayCell = document.createElement('td');
+            dayCell.contentEditable = 'true';
+            dayCell.setAttribute('data-label', 'Day');
+            dayCell.textContent = 'New Day';
+            newRow.appendChild(dayCell);
+
+            const placesCell = document.createElement('td');
+            placesCell.contentEditable = 'true';
+            placesCell.setAttribute('data-label', 'Places to Visit');
+            placesCell.textContent = '- New place to visit';
+            newRow.appendChild(placesCell);
+
+            const clothesCell = document.createElement('td');
+            clothesCell.contentEditable = 'true';
+            clothesCell.setAttribute('data-label', 'Clothes to Wear');
+            clothesCell.textContent = '- New clothes to wear';
+            newRow.appendChild(clothesCell);
+
+            table.appendChild(newRow);
+        }
+
+        function addColumn() {
+            const headerRow = document.querySelector('thead tr');
+            const newHeader = document.createElement('th');
+            newHeader.textContent = 'New Column';
+            headerRow.appendChild(newHeader);
+
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const newCell = document.createElement('td');
+                newCell.contentEditable = 'true';
+                newCell.setAttribute('data-label', 'New Column');
+                newCell.textContent = 'New Data';
+                row.appendChild(newCell);
+            });
+        }
+
+        function deleteRow() {
+            const table = document.querySelector('tbody');
+            if (table.rows.length > 0) {
+                table.deleteRow(-1);
+            } else {
+                alert('No rows to delete.');
+            }
+        }
+
+        function deleteColumn() {
+            const headerRow = document.querySelector('thead tr');
+            const headers = headerRow.getElementsByTagName('th');
+            if (headers.length > 3) {  // Prevent deleting essential columns
+                headerRow.deleteCell(-1);
+
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    if (row.cells.length > 3) {
+                        row.deleteCell(-1);
+                    }
+                });
+            } else {
+                alert('No columns to delete.');
+            }
+        }
+
+        function saveTableData() {
+            const tableData = [];
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => {
+                    rowData.push(cell.textContent);
+                });
+                tableData.push(rowData);
+            });
+            localStorage.setItem('vacationPlannerData', JSON.stringify(tableData));
+            alert('Data saved successfully!');
+        }
+
+        function loadTableData() {
+            const tableData = JSON.parse(localStorage.getItem('vacationPlannerData'));
+            if (tableData) {
+                const table = document.querySelector('tbody');
+                table.innerHTML = '';  // Clear existing table data
+                tableData.forEach(rowData => {
+                    const newRow = document.createElement('tr');
+                    rowData.forEach(cellData => {
+                        const cell = document.createElement('td');
+                        cell.textContent = cellData;
+                        cell.contentEditable = 'true';
+                        newRow.appendChild(cell);
+                    });
+                    table.appendChild(newRow);
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Vacation Day Planner</h1>
+    <div class="add-buttons">
+        <button onclick="addRow()">Add Row</button>
+        <button onclick="addColumn()">Add Column</button>
+    </div>
+    <div class="delete-buttons">
+        <button onclick="deleteRow()">Delete Row</button>
+        <button onclick="deleteColumn()">Delete Column</button>
+    </div>
+    <div class="save-buttons">
+        <button onclick="saveTableData()">Save Data</button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Places to Visit</th>
+                <th>Clothes to Wear</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-label="Day" contenteditable="true">Day 1</td>
+                <td data-label="Places to Visit" contenteditable="true">
+                    - Travel to Destination<br>
+                    - Explore local area<br>
+                    - Dinner at a nearby restaurant
+                </td>
+                <td data-label="Clothes to Wear" contenteditable="true">
+                    - Comfortable travel outfit<br>
+                    - Light jacket (if needed)<br>
+                    - Casual wear
+                </td>
+            </tr>
+            <tr>
+                <td data-label="Day" contenteditable="true">Day 2</td>
+                <td data-label="Places to Visit" contenteditable="true">
+                    - Visit historical sites<br>
+                    - Lunch at a local café<br>
+                    - Afternoon at a museum
+                </td>
+                <td data-label="Clothes to Wear" contenteditable="true">
+                    - Comfortable walking shoes<br>
+                    - Breathable top and pants/shorts<br>
+                    - Hat and sunglasses
+                </td>
+            </tr>
+            <!-- Repeat for other days -->
+        </tbody>
+    </table>
+</body>
+</html>
